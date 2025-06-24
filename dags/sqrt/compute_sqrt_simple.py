@@ -16,7 +16,7 @@ from airflow.sdk import dag, task
 logger = logging.getLogger(__name__)
 
 
-@task()
+@task
 def load_files() -> list:
     """Load files from the raw data directory.
 
@@ -52,6 +52,7 @@ def compute_sqrt(files: list) -> dict:
         A dictionary where keys are file paths and values are lists of computed square roots.
     """
     processed_files = {}
+    logger.info(len(files))
     for f in files:
         with open(f) as fh:
             processed_files[f] = []
@@ -74,20 +75,22 @@ def write_file(processed_files: dict) -> None:
     os.makedirs(dest, exist_ok=True)
 
     for filename, numbers in processed_files.items():
+        logger.info(filename)
         name = filename[filename.rindex("/") + 1 :]
+        logger.info(name)
         with open(os.path.join(dest, name), "w") as fh:
             for number in numbers:
                 fh.write(f"{str(number)}\n")
 
 
 @task
-def delete_files(processed_files: dict) -> None:
+def delete_files(files: list) -> None:
     """Delete the original files after processing.
 
     Args:
-        processed_files: A dictionary where keys are file paths and values are lists of computed square roots.
+        files: A list of file paths to delete.
     """
-    for filename in processed_files.keys():
+    for filename in files:
         os.remove(filename)
 
 
@@ -105,7 +108,7 @@ def compute_square_root() -> None:
     """
     files = load_files()
     processed_files = compute_sqrt(files)
-    write_file(processed_files) >> delete_files(processed_files)
+    write_file(processed_files) >> delete_files(files)
 
 
 compute_square_root()
