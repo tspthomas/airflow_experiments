@@ -72,6 +72,10 @@ def write_files(summaries: dict) -> None:
     Args:
         summaries: A dictionary where keys are file paths and values are the summaries of the content.
     """
+    if len(summaries) == 0:
+        logger.info("No summaries to write.")
+        return
+
     processed_data_dir = os.getenv("PROCESSED_DATA_DIR")
     dest = processed_data_dir + "/" + pendulum.now().strftime("%Y%m%d_%H%M%S")
     os.makedirs(dest, exist_ok=True)

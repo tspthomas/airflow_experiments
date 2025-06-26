@@ -51,6 +51,10 @@ def compute_sqrt(files: list) -> dict:
     Returns:
         A dictionary where keys are file paths and values are lists of computed square roots.
     """
+    if len(files) == 0:
+        logger.info("No files to process.")
+        return {}
+
     processed_files = {}
     logger.info(len(files))
     for f in files:
@@ -70,6 +74,10 @@ def write_file(processed_files: dict) -> None:
     Args:
         processed_files: A dictionary where keys are file paths and values are lists of computed square roots.
     """
+    if len(processed_files) == 0:
+        logger.info("No processed files to write.")
+        return
+
     processed_data_dir = os.getenv("PROCESSED_DATA_DIR")
     dest = processed_data_dir + "/" + pendulum.now().strftime("%Y%m%d_%H%M%S")
     os.makedirs(dest, exist_ok=True)
